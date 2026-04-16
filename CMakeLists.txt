@@ -32,8 +32,16 @@ add_executable(${PROJECT_NAME} src/main.cpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
 
 
-# copy assets
 
+
+
+
+# Inc
+
+
+
+
+# copy assets
 add_custom_command(
     OUTPUT ${CMAKE_SOURCE_DIR}/out/assets
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets ${CMAKE_SOURCE_DIR}/out/assets
