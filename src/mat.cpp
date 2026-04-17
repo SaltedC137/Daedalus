@@ -43,7 +43,7 @@ void Mat::apply(const std::function<float(float)> &fn) {
   }
 }
 
-// TODO:muitiple thread calculate
+// TODO: multiple thread calculate
 void Mat::matmul(Mat &dst, const Mat &a, const Mat &b) {
   assert(a.cols_ == b.rows_);
   assert(dst.rows_ == a.rows() && dst.cols_ == b.cols_);
@@ -52,10 +52,10 @@ void Mat::matmul(Mat &dst, const Mat &a, const Mat &b) {
   // simple i-k-j may be slightly faster for CPU cache in many case
 
   for (size_t i = 0; i < m; i++) {
-    for (size_t j = 0; j < n; j++) {
+    for (size_t j = 0; j < p; j++) {
       dst(i, j) = 0.0f;
     }
-    for (int k = 0; k < n; ++k) {
+    for (size_t k = 0; k < n; ++k) {
       float aik = a(i, k);
       for (size_t j = 0; j < p; j++) {
         dst(i, j) += aik * b(k, j);
@@ -93,14 +93,14 @@ void Mat::print(std::string_view name, int precision) const {
 }
 
 void Mat::dot(Mat &dst, const Mat &a, const Mat &b) {
-  assert(a.cols_ == b.cols_);
+  assert(a.cols_ == b.rows_);
   assert(dst.rows_ == a.rows_ && dst.cols_ == b.cols_);
 
   size_t n = a.cols_;
   for (size_t i = 0; i < dst.rows_; ++i) {
     for (size_t j = 0; j < dst.cols_; ++j) {
       dst(i, j) = 0.0f;
-      for (size_t k = 0; k < n; i++) {
+      for (size_t k = 0; k < n; k++) {
         dst(i, j) += a(i, k) * b(k, j);
       }
     }

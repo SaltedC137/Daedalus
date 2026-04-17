@@ -1,5 +1,5 @@
 #include "mat.hpp"
-#include <cstddef>
+#include <iostream>
 
 int main() {
   std::mt19937 rng{15};
@@ -12,8 +12,6 @@ int main() {
 
   nn::Mat C(A.rows(),B.cols());
   nn::Mat::matmul(C, A, B);
-
-
 
   C.print("C",3);
 }

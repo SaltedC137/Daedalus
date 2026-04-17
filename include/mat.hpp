@@ -22,8 +22,8 @@ class Mat {
   std::vector<float> data_;
 
 public:
-  Mat() : cols_(0), rows_(0) {}
-  Mat(size_t r, size_t c) : cols_(c), rows_(r), data_(r * c) {}
+  Mat() : rows_(0), cols_(0) {}
+  Mat(size_t r, size_t c) : rows_(r), cols_(c), data_(r * c) {}
 
   // rows & cols
   size_t rows() const noexcept { return rows_; };

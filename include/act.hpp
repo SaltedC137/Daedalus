@@ -11,12 +11,13 @@ inline float actf(float x, Act act) {
   case Act::SIGMOID:
     return 1.0f / (1.0f + std::exp(-x));
   case Act::RELU:
-    return x > 0 ? x : x * 0.0f;
+    return x > 0 ? x : x * 0.01f;
   case Act::SIN:
     return std::sin(x);
-  case Act::TANH:
+  case Act::TANH: {
     float ex = std::exp(x), enx = std::exp(-x);
     return (ex - enx) / (ex + enx);
+  }
   }
   return 0.0f;
 }
@@ -26,7 +27,7 @@ inline float dactf(float y, Act act) {
   case Act::SIGMOID:
     return y * (1.0f - y);
   case Act::RELU:
-    return y > 0 ? 1.0f : 0.0f;
+    return y > 0 ? 1.0f : 0.01f;
   case Act::TANH:
     return 1.0f - y * y;
   case Act::SIN:
