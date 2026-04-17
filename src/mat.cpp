@@ -10,26 +10,26 @@
 
 namespace nn {
 
-RowView Matrix_::row(size_t i) {
+RowView Mat::row(size_t i) {
   assert(i < rows_);
   return RowView{cols_, &data_[i * cols_]};
 }
 
-void Matrix_::fill(float v) { std::fill(data_.begin(), data_.end(), v); }
+void Mat::fill(float v) { std::fill(data_.begin(), data_.end(), v); }
 
-void Matrix_::rand_fill(float low, float high, std::mt19937 &rng) {
+void Mat::rand_fill(float low, float high, std::mt19937 &rng) {
   std::uniform_real_distribution<float> d(low, high);
   for (auto &x : data_) {
     x = d(rng);
   }
 }
 
-void Matrix_::copy_from(const Matrix_ &src) {
+void Mat::copy_from(const Mat &src) {
   assert(rows_ == src.rows_ && cols_ == src.cols_);
   data_ = src.data_;
 }
 
-void Matrix_::add_inplace(const Matrix_ &other) {
+void Mat::add_inplace(const Mat &other) {
   assert(rows_ == other.rows_ && cols_ == other.cols_);
   for (size_t i = 0, n = data_.size(); i < n; i++) {
     data_[i] += other.data_[i];
@@ -37,14 +37,14 @@ void Matrix_::add_inplace(const Matrix_ &other) {
 }
 
 // user-defined
-void Matrix_::apply(const std::function<float(float)> &fn) {
+void Mat::apply(const std::function<float(float)> &fn) {
   for (auto &v : data_) {
     fn(v);
   }
 }
 
 // TODO:muitiple thread calculate
-void Matrix_::matmul(Matrix_ &dst, const Matrix_ &a, const Matrix_ &b) {
+void Mat::matmul(Mat &dst, const Mat &a, const Mat &b) {
   assert(a.cols_ == b.rows_);
   assert(dst.rows_ == a.rows() && dst.cols_ == b.cols_);
 
@@ -64,7 +64,7 @@ void Matrix_::matmul(Matrix_ &dst, const Matrix_ &a, const Matrix_ &b) {
   }
 }
 
-void Matrix_::shuffle_rows(std::mt19937 &rng) {
+void Mat::shuffle_rows(std::mt19937 &rng) {
   for (size_t i = 0; i < rows_; i++) {
     std::uniform_int_distribution<size_t> d(i, rows_ - 1);
     size_t j = d(rng);
@@ -78,7 +78,7 @@ void Matrix_::shuffle_rows(std::mt19937 &rng) {
   }
 }
 
-void Matrix_::print(std::string_view name, int precision) const {
+void Mat::print(std::string_view name, int precision) const {
   if (!name.empty())
     std::cout << name << " = [\n";
   for (size_t i = 0; i < rows_; ++i) {
@@ -91,5 +91,37 @@ void Matrix_::print(std::string_view name, int precision) const {
   if (!name.empty())
     std::cout << "    ]\n";
 }
+
+void Mat::dot(Mat &dst, const Mat &a, const Mat &b) {
+  assert(a.cols_ == b.cols_);
+  assert(dst.rows_ == a.rows_ && dst.cols_ == b.cols_);
+
+  size_t n = a.cols_;
+  for (size_t i = 0; i < dst.rows_; ++i) {
+    for (size_t j = 0; j < dst.cols_; ++j) {
+      dst(i, j) = 0.0f;
+      for (size_t k = 0; k < n; i++) {
+        dst(i, j) += a(i, k) * b(k, j);
+      }
+    }
+  }
+}
+
+void Mat::sum(Mat &dst, const Mat &src) {
+  assert(dst.rows_ == src.rows_ && dst.cols_ == src.cols_);
+  for (size_t i = 0; i < dst.data_.size(); ++i) {
+    dst.data_[i] += src.data_[i];
+  }
+}
+
+void Mat::act(Mat &dst, Act activation) {
+  for (auto &i : dst.data_) {
+    i = actf(i, activation);
+  }
+}
+
+
+
+
 
 } // namespace nn

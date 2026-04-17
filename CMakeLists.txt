@@ -27,8 +27,8 @@ project(DAEDALUS VERSION 0.1.0 LANGUAGES CXX)
 
 find_package(raylib CONFIG REQUIRED)
 
- file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS src/*.cpp)
- add_executable(${PROJECT_NAME} ${SRC_FILES})
+file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS src/*.cpp)
+add_executable(${PROJECT_NAME} ${SRC_FILES})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
 
