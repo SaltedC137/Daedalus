@@ -16,10 +16,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/out)
 
 # vcpkg toolchain
-if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
-        CACHE STRING "Vcpkg toolchain file")
-    message("find vcpkg")
+if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+    if(DEFINED ENV{VCPKG_ROOT})
+        set(VCPKG_TOOLCHAIN "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
+        if(EXISTS "${VCPKG_TOOLCHAIN}")
+            set(CMAKE_TOOLCHAIN_FILE "${VCPKG_TOOLCHAIN}"
+                CACHE STRING "Vcpkg toolchain file")
+            message(STATUS "Found vcpkg toolchain: ${VCPKG_TOOLCHAIN}")
+        else()
+            message(STATUS "VCPKG_ROOT is set but vcpkg toolchain not found at ${VCPKG_TOOLCHAIN}; vcpkg will not be used.")
+        endif()
+    endif()
 endif()
 
 
