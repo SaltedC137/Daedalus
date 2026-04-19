@@ -18,6 +18,7 @@ public:
   void alloc(const std::vector<size_t> &architecture);
 
   Mat &input() { return as[0]; }
+
   Mat &output() { return as[arch.size() - 1]; }
 
   void forward();
