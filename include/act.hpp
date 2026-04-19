@@ -1,6 +1,5 @@
-
+#pragma once
 #include <cmath>
-
 
 enum class Act { SIGMOID, RELU, TANH, SIN };
 

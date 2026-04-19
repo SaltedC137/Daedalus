@@ -1,3 +1,4 @@
+#pragma once
 #include "mat.hpp"
 #include <cstddef>
 #include <vector>

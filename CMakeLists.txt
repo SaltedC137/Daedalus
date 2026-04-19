@@ -52,7 +52,7 @@ target_include_directories(${PROJECT_NAME}
 add_custom_command(
     OUTPUT ${CMAKE_SOURCE_DIR}/out/assets
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets ${CMAKE_SOURCE_DIR}/out/assets
-    COMMENT "Copying icon folder to out directory"
+    COMMENT "Copying assets folder to out directory"
 )
 
 add_custom_target(copy_icon ALL

@@ -1,10 +1,10 @@
-
+#pragma once
+#include "act.hpp"
 #include <cassert>
 #include <cstddef>
 #include <functional>
 #include <random>
 #include <vector>
-#include "act.hpp"
 
 struct RowView {
 
@@ -62,8 +62,8 @@ public:
 
   static void sum(Mat &dst, const Mat &src);
 
-  static void act(Mat &dst,Act activation);
-  
+  static void act(Mat &dst, Act activation);
+
   void print(std::string_view name = {}, int precision = 6) const;
 };
 

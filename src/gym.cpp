@@ -1,5 +1,6 @@
-#include "mat.hpp"
+#include "set.hpp"
 #include <iostream>
+#include <vector>
 
 int main() {
   std::mt19937 rng{15};
@@ -10,8 +11,21 @@ int main() {
   A.print();
   B.print();
 
-  nn::Mat C(A.rows(),B.cols());
+  nn::Mat C(A.rows(), B.cols());
   nn::Mat::matmul(C, A, B);
 
-  C.print("C",3);
+  C.print("C", 3);
+
+  std::vector<nn::Mat> mnist_img =
+      nn::load_mnist_img("assets/data/t10k-images.idx3-ubyte");
+
+  std::vector<int> mnist_lab =
+      nn ::load_mnist_lab("assets/data/t10k-labels.idx1-ubyte");
+
+  if (!mnist_lab.empty()) {
+    std::cout << "Success load it. \n";
+    std::cout << "size :" << mnist_img.size() << std::endl;
+  } else {
+    std::cout << "load fail!!";
+  }
 }
