@@ -1,43 +1,46 @@
 cmake_minimum_required(VERSION 3.14)
 
+# 1. Set default build type to Release
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+endif()
 
-# Enable compile_commands.json for IDE support
+# 2. Export compile commands for IDE support
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 
-
-# Global C++ standard
+# 3. Set C++ standard
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-
-# output file
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/out)
-
-# vcpkg toolchain for windows
-if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-    if(DEFINED ENV{VCPKG_ROOT})
-        set(VCPKG_TOOLCHAIN "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
-        if(EXISTS "${VCPKG_TOOLCHAIN}")
-            set(CMAKE_TOOLCHAIN_FILE "${VCPKG_TOOLCHAIN}"
-                CACHE STRING "Vcpkg toolchain file")
-            message(STATUS "Found vcpkg toolchain: ${VCPKG_TOOLCHAIN}")
-        else()
-            message(STATUS "VCPKG_ROOT is set but vcpkg toolchain not found at ${VCPKG_TOOLCHAIN}; vcpkg will not be used.")
-        endif()
-    endif()
-endif()
-
-
 project(DAEDALUS VERSION 0.1.0 LANGUAGES CXX)
 
-find_package(raylib CONFIG REQUIRED)
+# Set output directory for the executable
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/out)
 
-file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS src/*.cpp)
+# 4. Compiler optimizations
+if(MSVC)
+    # Windows / MSVC
+    add_compile_options(/O2 /Oi /Ot /GL)
+else()
+    # Linux/macOS (GCC/Clang)
+    # -O3: Maximum optimization
+    # -march=native: Architecture specific optimization
+    # -ffast-math: Aggressive floating point optimization
+    add_compile_options(-O3 -march=native -ffast-math)
+endif()
+
+find_package(raylib CONFIG REQUIRED)
+find_package(Threads REQUIRED)
+find_package(OpenMP REQUIRED)
+
+file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS 
+  src/train.cpp 
+  src/mat.cpp 
+  src/net.cpp
+)
 add_executable(${PROJECT_NAME} ${SRC_FILES})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
+target_link_libraries(${PROJECT_NAME} PRIVATE raylib Threads::Threads OpenMP::OpenMP_CXX)
 
 
 # Include dirc

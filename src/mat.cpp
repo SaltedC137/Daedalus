@@ -7,6 +7,8 @@
 #include <iostream>
 #include <random>
 #include <utility>
+#include <omp.h>
+#include <vector>
 
 namespace nn {
 
@@ -43,14 +45,13 @@ void Mat::apply(const std::function<float(float)> &fn) {
   }
 }
 
-// TODO: multiple thread calculate
 void Mat::matmul(Mat &dst, const Mat &a, const Mat &b) {
   assert(a.cols_ == b.rows_);
   assert(dst.rows_ == a.rows() && dst.cols_ == b.cols_);
 
   size_t m = a.rows_, n = a.cols_, p = b.cols_;
-  // simple i-k-j may be slightly faster for CPU cache in many case
-
+  
+  #pragma omp parallel for
   for (size_t i = 0; i < m; i++) {
     for (size_t j = 0; j < p; j++) {
       dst(i, j) = 0.0f;
@@ -119,9 +120,5 @@ void Mat::act(Mat &dst, Act activation) {
     i = actf(i, activation);
   }
 }
-
-
-
-
 
 } // namespace nn

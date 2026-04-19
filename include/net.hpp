@@ -22,7 +22,7 @@ public:
 
   Mat &output() { return as[arch.size() - 1]; }
 
-  void forward();
+  void forward(std::vector<Mat> &as_local) const;
 
   float loss(const Mat &t);
 
