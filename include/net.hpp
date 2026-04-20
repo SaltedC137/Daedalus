@@ -14,6 +14,19 @@ public:
   std::vector<Mat> as; // activation
   Act activation;
 
+
+  // adam optimizer
+
+  std::vector<Mat> m_ws, m_bs;
+  std::vector<Mat> v_ws, v_bs;
+  size_t adam_t = 0;
+
+
+  static constexpr float ADAM_BETA1 = 0.9f;
+  static constexpr float ADAM_BETA2 = 0.999f;
+  static constexpr float ADAM_EPS = 1e-8f;
+
+  
   Net() : activation(Act::SIGMOID) {}
 
   void alloc(const std::vector<size_t> &architecture);
@@ -29,6 +42,11 @@ public:
   Net backprop(const Mat &t);
 
   void learn(const Net &g, float rate);
+
+  void init_adam(); 
+  void adam_learn(const Net &g, float rate);
+
 };
 
 } // namespace nn
+ 
