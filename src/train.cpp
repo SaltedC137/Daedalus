@@ -1,10 +1,24 @@
+#include "act.hpp"
 #include "mat.hpp"
 #include "net.hpp"
 #include "set.hpp"
+#include <cmath>
 #include <cstddef>
 #include <iostream>
 #include <random>
 #include <vector>
+
+void model(nn::Net &net, size_t input_size, size_t output_size) {
+  // init
+  net.arch.push_back(input_size);
+  net.as.push_back(nn::Mat(1, input_size));
+
+  net.add_dense(256, Act::RELU);
+  net.add_dense(128, Act::RELU);
+
+  // output
+  net.add_dense(output_size, Act::SIGMOID);
+}
 
 void train() {
 
@@ -29,24 +43,33 @@ void train() {
   size_t output_size = 10;
 
   nn::Net net;
-  net.alloc({input_size, 128, 64, output_size});
-  net.activation = Act::RELU;
+
+  model(net, input_size, output_size);
+
+  for (auto &w : net.ws) {
+    float limit = std::sqrt(6.0f / (w.rows() + w.cols()));
+    w.rand_fill(-limit, limit, rng);
+  }
+
+  for (auto &b : net.bs) {
+    b.fill(0.0f);
+  }
 
   nn::Mat target(count, input_size + output_size);
   for (size_t i = 0; i < count; i++) {
     for (size_t j = 0; j < input_size; j++) {
-      target(i, j) = mnist_img[i](0, j) / 255.0f;  // 归一化到 [0, 1]
+      target(i, j) = mnist_img[i](0, j) / 255.0f;
     }
     for (size_t j = 0; j < output_size; j++) {
       target(i, input_size + j) = (j == mnist_lab[i]) ? 1.0f : 0.0f;
     }
   }
 
-  float learn_rate = 0.001f;  // 增加到 0.01
+  float learn_rate = 0.007f;
   size_t epochs = 10;
-  size_t batch_size = 32;
+  size_t batch_size = 64;
 
-  net.init_adam();  // 初始化一次，放在训练循环外
+  net.init_adam();
 
   for (size_t epoch = 0; epoch < epochs; epoch++) {
     target.shuffle_rows(rng);

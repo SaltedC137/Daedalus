@@ -1,14 +1,18 @@
 
 #include "net.hpp"
+#include "act.hpp"
+#include "layer.hpp"
 #include "mat.hpp"
 #include <cassert>
 #include <cmath>
 #include <cstddef>
+#include <fstream>
 #include <omp.h>
 #include <vector>
 
 namespace nn {
 
+#if 1
 void Net::alloc(const std::vector<size_t> &architecture) {
 
   arch = architecture;
@@ -23,12 +27,15 @@ void Net::alloc(const std::vector<size_t> &architecture) {
     as[i] = Mat(1, arch[i]);
   }
 }
+#endif
 
 void Net::forward(std::vector<Mat> &as_local) const {
   for (size_t i = 0; i < arch.size() - 1; ++i) {
     Mat::dot(as_local[i + 1], as_local[i], ws[i]);
     Mat::sum(as_local[i + 1], bs[i]);
-    Mat::act(as_local[i + 1], activation);
+
+    Act layer_act = layer[i].activation;
+    Mat::act(as_local[i + 1], layer_act);
   }
 }
 
@@ -112,7 +119,9 @@ Net Net::backprop(const Mat &t) {
         for (size_t j = 0; j < arch[l]; ++j) {
           float a = local_as[l](0, j);
           float da = das[l](0, j);
-          float qa = dactf(a, activation);
+
+          Act layer_act = this->layer[l - 1].activation;
+          float qa = dactf(a, layer_act);
 
           g.bs[l - 1](0, j) += da * qa;
 
@@ -193,6 +202,8 @@ void Net::adam_learn(const Net &g, float lr) {
     for (size_t j = 0; j < ws_size; ++j) {
       float g_val = g.ws[i].data()[j];
 
+      g_val += lambda * ws[i].data()[j];
+
       m_ws[i].data()[j] =
           ADAM_BETA1 * m_ws[i].data()[j] + (1 - ADAM_BETA1) * g_val;
 
@@ -221,6 +232,23 @@ void Net::adam_learn(const Net &g, float lr) {
 
       bs[i](0, t) -= lr * m_hat / (std::sqrt(v_hat) + ADAM_EPS);
     }
+  }
+}
+
+void Net::add_dense(size_t output_size, Act activation_fn) {
+  size_t input_size = arch.empty() ? 0 : arch.back();
+
+  if (arch.empty()) {
+    arch.push_back(output_size);
+    as.push_back(Mat(1, output_size));
+  } else {
+    arch.push_back(output_size);
+
+    ws.push_back(Mat(input_size, output_size));
+    bs.push_back(Mat(1, output_size));
+    as.push_back(Mat(1, output_size));
+
+    layer.push_back(Layer(input_size, output_size, activation_fn));
   }
 }
 

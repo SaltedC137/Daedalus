@@ -1,4 +1,6 @@
 #pragma once
+#include "act.hpp"
+#include "layer.hpp"
 #include "mat.hpp"
 #include <cstddef>
 #include <vector>
@@ -14,19 +16,18 @@ public:
   std::vector<Mat> as; // activation
   Act activation;
 
-
   // adam optimizer
 
   std::vector<Mat> m_ws, m_bs;
   std::vector<Mat> v_ws, v_bs;
   size_t adam_t = 0;
 
-
   static constexpr float ADAM_BETA1 = 0.9f;
   static constexpr float ADAM_BETA2 = 0.999f;
   static constexpr float ADAM_EPS = 1e-8f;
 
-  
+  float lambda = 0.0001f;
+
   Net() : activation(Act::SIGMOID) {}
 
   void alloc(const std::vector<size_t> &architecture);
@@ -43,10 +44,15 @@ public:
 
   void learn(const Net &g, float rate);
 
-  void init_adam(); 
+  void init_adam();
   void adam_learn(const Net &g, float rate);
 
+  void save(const char *filename) const;
+
+  void load(const char *filename);
+
+  std::vector<Layer> layer;
+  void add_dense(size_t output_size, Act activation);
 };
 
 } // namespace nn
- 
