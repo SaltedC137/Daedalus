@@ -1,7 +1,7 @@
 #pragma once
 #include <cmath>
 
-enum class Act { SIGMOID, RELU, TANH, SIN };
+enum class Act { SIGMOID, RELU, TANH, SIN, SOFTMAX };
 
 namespace nn {
 
@@ -17,6 +17,9 @@ inline float actf(float x, Act act) {
     float ex = std::exp(x), enx = std::exp(-x);
     return (ex - enx) / (ex + enx);
   }
+  case Act::SOFTMAX: {
+    return  x;
+  }
   }
   return 0.0f;
 }
@@ -31,6 +34,9 @@ inline float dactf(float y, Act act) {
     return 1.0f - y * y;
   case Act::SIN:
     return std::cos(std::asin(y));
+  case Act::SOFTMAX: {
+    return 1.0f;
+  }
   }
   return 0.0f;
 }

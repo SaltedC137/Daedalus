@@ -17,7 +17,7 @@ void model(nn::Net &net, size_t input_size, size_t output_size) {
   net.add_dense(128, Act::RELU);
 
   // output
-  net.add_dense(output_size, Act::SIGMOID);
+  net.add_dense(output_size, Act::SOFTMAX);
 }
 
 void train() {
@@ -58,14 +58,14 @@ void train() {
   nn::Mat target(count, input_size + output_size);
   for (size_t i = 0; i < count; i++) {
     for (size_t j = 0; j < input_size; j++) {
-      target(i, j) = mnist_img[i](0, j) / 255.0f;
+      target(i, j) = mnist_img[i](0, j);
     }
     for (size_t j = 0; j < output_size; j++) {
       target(i, input_size + j) = (j == mnist_lab[i]) ? 1.0f : 0.0f;
     }
   }
 
-  float learn_rate = 0.007f;
+  float learn_rate = 0.001f;
   size_t epochs = 10;
   size_t batch_size = 64;
 
@@ -93,9 +93,13 @@ void train() {
     }
 
     float avg_loss = total_loss / num_batches;
+
+    net.save("t10k-mnist-trained-model.bin");
+
     std::cout << "  Epoch " << epoch + 1 << "/" << epochs << "  Loss "
               << avg_loss << std::endl;
   }
+  
   std::cout << "Train Finish" << std::endl;
   return;
 }

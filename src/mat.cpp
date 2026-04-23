@@ -5,9 +5,9 @@
 #include <functional>
 #include <iomanip>
 #include <iostream>
+#include <omp.h>
 #include <random>
 #include <utility>
-#include <omp.h>
 #include <vector>
 
 namespace nn {
@@ -50,8 +50,8 @@ void Mat::matmul(Mat &dst, const Mat &a, const Mat &b) {
   assert(dst.rows_ == a.rows() && dst.cols_ == b.cols_);
 
   size_t m = a.rows_, n = a.cols_, p = b.cols_;
-  
-  #pragma omp parallel for
+
+#pragma omp parallel for
   for (size_t i = 0; i < m; i++) {
     for (size_t j = 0; j < p; j++) {
       dst(i, j) = 0.0f;
@@ -118,6 +118,27 @@ void Mat::sum(Mat &dst, const Mat &src) {
 void Mat::act(Mat &dst, Act activation) {
   for (auto &i : dst.data_) {
     i = actf(i, activation);
+  }
+}
+
+// softmax
+void Mat::softmax(Mat &dst, const Mat &src) {
+  assert(dst.rows_ == src.rows_ && dst.cols_ == src.cols_);
+
+  for (size_t i = 0; i < src.rows_; ++i) {
+    float max_val = src(i, 0);
+    for (size_t j = 1; j < src.cols_; ++j) {
+      if (src(i, j) > max_val)
+        max_val = src(i, j);
+    }
+    float sum_exp = 0.0f;
+    for (size_t j = 0; j < src.cols_; ++j) {
+      dst(i, j) = std::exp(src(i, j) - max_val);
+      sum_exp += dst(i, j);
+    }
+    for (size_t j = 0; j < src.cols_; ++j) {
+      dst(i, j) /= sum_exp;
+    }
   }
 }
 

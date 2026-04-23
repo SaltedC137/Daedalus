@@ -64,6 +64,9 @@ public:
 
   static void act(Mat &dst, Act activation);
 
+
+  static void softmax(Mat &dst,const Mat &src);
+
   void print(std::string_view name = {}, int precision = 6) const;
 };
 
