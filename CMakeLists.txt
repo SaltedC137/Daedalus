@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-# 1. Set default build type to Release
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
-endif()
+
 
 # 2. Export compile commands for IDE support
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -26,16 +23,19 @@ else()
     # -O3: Maximum optimization
     # -march=native: Architecture specific optimization
     # -ffast-math: Aggressive floating point optimization
-    add_compile_options(-O3 -march=native -ffast-math)
+    add_compile_options(-march=native)
 endif()
+
+
+
 
 find_package(raylib CONFIG REQUIRED)
 find_package(Threads REQUIRED)
 find_package(OpenMP REQUIRED)
 
-file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS 
-  src/train.cpp 
-  src/mat.cpp 
+file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS
+  src/train.cpp
+  src/mat.cpp
   src/net.cpp
 )
 add_executable(${PROJECT_NAME} ${SRC_FILES})
@@ -44,11 +44,21 @@ target_link_libraries(${PROJECT_NAME} PRIVATE raylib Threads::Threads OpenMP::Op
 
 
 # Include dirc
-target_include_directories(${PROJECT_NAME} 
+target_include_directories(${PROJECT_NAME}
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/3party>
 )
+
+
+# Set different compiler options based on build type
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_compile_options(${PROJECT_NAME} PRIVATE -g -O0)
+elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+    target_compile_options(${PROJECT_NAME} PRIVATE -O3 -ffast-math)
+elseif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+  target_compile_options(${PROJECT_NAME} PRIVATE -O2 -g)
+endif()
 
 
 # copy assets
@@ -61,10 +71,3 @@ add_custom_command(
 add_custom_target(copy_icon ALL
     DEPENDS ${CMAKE_SOURCE_DIR}/out/assets
 )
-
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(${PROJECT_NAME} PRIVATE -O3)
-elseif(MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE /O2)
-endif()
-
