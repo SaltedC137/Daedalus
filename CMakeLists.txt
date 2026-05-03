@@ -35,6 +35,11 @@ file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS
   src/mat.cpp
   src/net.cpp
 )
+
+#Asan options
+add_link_options(-fsanitize=address)
+
+# Create the executable target
 add_executable(${PROJECT_NAME} ${SRC_FILES})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib Threads::Threads OpenMP::OpenMP_CXX)
@@ -58,7 +63,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
 elseif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
   target_compile_options(${PROJECT_NAME} PRIVATE -O2 -g)
 # Asan options
-elseif(CMAKE_BUILD_TYPE STREQUAL "Aans")
+elseif(CMAKE_BUILD_TYPE STREQUAL "Asan")
   target_compile_options(${PROJECT_NAME} PRIVATE -ggdb -O0 -Wall -Wextra -mavx2
       -fsanitize=address
       -fno-omit-frame-pointer
@@ -67,9 +72,6 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Aans")
       -fsanitize-recover=address)
 endif()
 
-
-#Asan options
-add_link_options(-fsanitize=address)
 
 # copy assets
 add_custom_command(

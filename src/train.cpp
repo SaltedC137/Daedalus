@@ -104,4 +104,7 @@ void train() {
   return;
 }
 
-int main() { train(); }
+int main() {
+  train();
+  return 0;
+}
