@@ -49,8 +49,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE raylib Threads::Threads OpenMP::Op
 target_include_directories(${PROJECT_NAME}
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/3party>
-)   
+)
 
 
 # Set different compiler options based on build type
